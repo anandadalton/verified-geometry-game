@@ -1,0 +1,13 @@
+_build/
+.merlin
+*.install
+_opam/
+
+*.vo
+*.vok
+*.vos
+*.glob
+*.aux
+
+*~
+*.swp

@@ -1,0 +1,5 @@
+(coq.theory
+ (name GameModel)
+ (package verified-geometry-game)
+ (theories Stdlib)
+ (modules :standard))
