@@ -22,6 +22,11 @@ Definition eqb_F3 (x y : F3) : bool :=
   | F0, F0 => true | F1, F1 => true | F2, F2 => true | _, _ => false
   end.
 
+Lemma eqb_F3_refl : forall x : F3, eqb_F3 x x = true.
+Proof.
+  intro x. destruct x; reflexivity.
+Qed.
+
 Lemma eqb_F3_spec : forall x y : F3, reflect (x = y) (eqb_F3 x y).
 Proof.
  intros x y. apply iff_reflect.
@@ -54,7 +59,6 @@ Proof.
   repeat rewrite andb_true_iff.
   (* The next step transforms eqb_F3 into =.*)
   repeat rewrite <- (reflect_iff _ _ (eqb_F3_spec _ _)).
-  
   split; intro H.
   - (* Forward: Prove if the points are equal, the components are. *)
     inversion H. tauto.
@@ -62,6 +66,12 @@ Proof.
     (* First we need to peel apart that conjucted hypothesis. *)
     destruct H as [[[H1 H2] H3] H4].
     subst. reflexivity.
+Qed.
+
+Lemma eqb_Point_refl : forall p : Point, eqb_Point p p = true.
+Proof.
+  intro p. destruct p as [d1 d2 d3 d4].
+  unfold eqb_Point. simpl. repeat rewrite eqb_F3_refl. reflexivity.
 Qed.
 
 Instance Eqb_Point : Eqb Point := {
