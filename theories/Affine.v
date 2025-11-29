@@ -31,7 +31,7 @@ Lemma eqb_F3_spec : forall x y : F3, reflect (x = y) (eqb_F3 x y).
 Proof.
  intros x y. apply iff_reflect.
  destruct x, y; simpl; split; auto; discriminate.
-Qed.
+Defined.
 
 Instance Eqb_F3 : Eqb F3 := {
   eqb := eqb_F3;
@@ -66,7 +66,7 @@ Proof.
     (* First we need to peel apart that conjucted hypothesis. *)
     destruct H as [[[H1 H2] H3] H4].
     subst. reflexivity.
-Qed.
+Defined.
 
 Lemma eqb_Point_refl : forall p : Point, eqb_Point p p = true.
 Proof.

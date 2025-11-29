@@ -2,4 +2,19 @@
  (name GameModel)
  (package verified-geometry-game)
  (theories Stdlib)
- (modules :standard))
+ (modules :standard \ Extract))
+
+(rule
+ (targets game_engine.ml game_engine.mli)
+ (deps
+   Extract.v
+   GameState.vo
+   Affine.vo)
+ (action
+  (run %{bin:coqc} -q -R . GameModel Extract.v)))
+
+(library
+ (name game_engine)
+ (public_name verified-geometry-game.engine)
+ (modules game_engine)
+ (wrapped false))
