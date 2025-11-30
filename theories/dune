@@ -9,7 +9,10 @@
  (deps
    Extract.v
    GameState.vo
-   Affine.vo)
+   Affine.vo
+   Deck.vo
+   Display.vo
+   ClientState.vo)
  (action
   (run %{bin:coqc} -q -R . GameModel Extract.v)))
 

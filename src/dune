@@ -1,0 +1,7 @@
+(executable
+  (name Client)
+  (modes js)
+  (modules Client)
+  (libraries
+     verified-geometry-game.engine 
+     brr))
