@@ -75,15 +75,16 @@ Definition should_stop (board : list Point) :=
    this is primarily a convenience for animating them. *)
 Fixpoint deal (deck : list CardTriple) (board : list Point) (dealt : list Point)
     : (list CardTriple * list Point * list Point) :=
-  match deck with
-  | [] => ([], board, dealt)
-  | ((mkTriple c1 c2 c3) :: deck') =>
-    let board' := c1 :: c2 :: c3 :: board in
-    let dealt' := c1 :: c2 :: c3 :: dealt in
-      if should_stop board'
-      then (deck', board', dealt')
-      else deal deck' board' dealt'
-  end.
+  if should_stop board then
+    (deck, board, dealt)
+  else
+    match deck with
+    | [] => ([], board, dealt)
+    | ((mkTriple c1 c2 c3) :: deck') =>
+      let board' := c1 :: c2 :: c3 :: board in
+      let dealt' := c1 :: c2 :: c3 :: dealt in
+        deal deck' board' dealt'
+    end.
 
 Definition after_deal_invariant (deck_board : list CardTriple * list Point) :=
   fst deck_board = [] \/ ((has_valid_triple (snd deck_board) /\ 12 <= length (snd deck_board))).
@@ -106,9 +107,9 @@ Theorem deal_satisfies_invariant :
 Proof.
   intros deck.
   induction deck as [|h deck' IH]; intros board dealt.
-  - simpl. left. reflexivity.
+  - simpl. left. destruct (should_stop board); reflexivity.
   - destruct h as [c1 c2 c3]. simpl.
-    destruct (should_stop (c1::c2::c3::board)) eqn:Hstop.
+    destruct (should_stop board) eqn:Hstop.
     + apply stopping_condition_sound. assumption.
     + apply IH.
 Qed.

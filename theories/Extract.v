@@ -25,5 +25,5 @@ Extraction "game_engine.ml"
   sync_grid
   Model mkModel
   init_model
-  Status MsgSelect MsgChecking MsgMatch MsgInvalid MsgGameOver
+  Status MsgSelect MsgMatch MsgInvalid MsgGameOver
   ui_update.

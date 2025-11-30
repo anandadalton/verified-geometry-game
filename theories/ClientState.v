@@ -3,12 +3,12 @@ From Stdlib Require Import Bool List.
 Import ListNotations.
 
 Inductive Status : Type :=
-  | MsgSelect | MsgChecking | MsgMatch | MsgInvalid | MsgGameOver.
+  | MsgSelect | MsgMatch | MsgInvalid | MsgGameOver.
 
 Record Model : Type := mkModel {
   game_state : State;
   display_grid : Grid;
-  status : Status;
+  status_message : Status;
   game_over : bool;
 }.
 

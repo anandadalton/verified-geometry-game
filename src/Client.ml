@@ -41,6 +41,12 @@ let get_geometry col_idx row_idx =
   let y = start_y +. (float_of_int row_idx) *. (card_h +. gap_y) in
   (x, y, card_w, card_h)
 
+let status_to_string = function
+  | MsgSelect -> "Select 3 cards..."
+  | MsgMatch -> "Match Found!"
+  | MsgInvalid -> "Not a Valid Match"
+  | MsgGameOver -> "Game Over! Refresh to Restart"
+
 let define_shape path shape_type size =
   let r = size /. 2.0 in
   match shape_type with
@@ -131,16 +137,7 @@ let render_scene ctx state =
   C2d.clear_rect ctx ~x:0. ~y:0. ~w:1000. ~h:1000.;
 
   let core = state.Game_engine.game_state in
-  let board_len = List.length core.board in
-  let deck_len = List.length core.deck in
-  let grid_len = List.length state.display_grid in
 
-  Console.(log [str (
-    "FRAME DEBUG: " ^
-    "Board=" ^ string_of_int board_len ^ " | " ^
-    "Deck=" ^ string_of_int deck_len ^ " | " ^
-    "Grid=" ^ string_of_int grid_len
-  )]);
   let phase = core.current_phase in
 
   let get_style card =
@@ -156,18 +153,23 @@ let render_scene ctx state =
     | GameOver -> Normal
     in
 
-    List.iteri (fun col_idx column ->
-      let render_slot row_idx slot_opt =
-        match slot_opt with
-        | None -> () (* Maybe a placeholder? *)
-        | Some card ->
-            let (x, y, w, h) = get_geometry col_idx row_idx in
-            draw_card ctx card x y w h (get_style card)
-      in
-      render_slot 0 column.r1;
-      render_slot 1 column.r2;
-      render_slot 2 column.r3;
-    ) state.display_grid
+  List.iteri (fun col_idx column ->
+    let render_slot row_idx slot_opt =
+      match slot_opt with
+      | None -> () (* Maybe a placeholder? *)
+      | Some card ->
+          let (x, y, w, h) = get_geometry col_idx row_idx in
+          draw_card ctx card x y w h (get_style card)
+    in
+    render_slot 0 column.r1;
+    render_slot 1 column.r2;
+    render_slot 2 column.r3;
+  ) state.display_grid;
+  
+  C2d.set_fill_style ctx (C2d.color (Jstr.v "black"));
+  C2d.set_font ctx (Jstr.v "24px sans-serif");
+  let msg = status_to_string state.status_message in
+  C2d.fill_text ctx (Jstr.v msg) ~x:20. ~y:450.
 
 let app_state = ref None
 
