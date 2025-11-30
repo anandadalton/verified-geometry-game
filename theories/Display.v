@@ -1,7 +1,8 @@
-From Stdlib Require Import Bool List.
+From Stdlib Require Import Bool List ZArith.
 Import ListNotations.
 
 Require Import Affine.
+Require Import Geometry.
 
 Definition Slot := option Point.
 Record Column : Type := mkColumn {
@@ -108,4 +109,28 @@ Definition sync_grid (old_grid : Grid) (flat_board : list Point) : Grid :=
   let to_add := filter (fun p => negb (existsb (fun v => eqb_Point v p) flattened_grid)) flat_board in
   let filled_grid := fill_grid clean_grid to_add in
   prune_grid filled_grid.
+
+Definition layout_grid (g : Grid) : list (Point * Rect) :=
+  (fix loop_cols (cols : Grid) (col_idx : Z) : list (Point * Rect) :=
+    match cols with
+    | [] => []
+    | c :: rest =>
+      let col_items :=
+        match r1 c with Some p => [(p, get_rect_for_slot col_idx 0)] | None => [] end ++
+        match r2 c with Some p => [(p, get_rect_for_slot col_idx 1)] | None => [] end ++
+        match r3 c with Some p => [(p, get_rect_for_slot col_idx 2)] | None => [] end
+      in
+      col_items ++ (loop_cols rest (col_idx + 1))
+    end
+  ) g 0.
+
+Definition resolve_click (g : Grid) (x y : Z) : option Point :=
+  let items := layout_grid g in
+  let hit := find (fun item =>
+    let '(_, r) := item in is_inside x y r
+  ) items in
+  match hit with
+  | Some (p, _) => Some p
+  | None => None
+  end.
 

@@ -38,7 +38,7 @@ Definition handle_click (current : Selection) (p : Point) : SelectResult :=
     else TriggerCheck (mkTriple c1 c2 p)
   end.
 
-Inductive Event :=
+Inductive GameEvent :=
 | CardClick (card : Point)
 | AnimationDone.
 
@@ -134,7 +134,7 @@ Qed.
    Note to self: there is some neat syntactic sugar apparently for "updating"
    fields, but I don't know if I want to add coq-record-update to this toy
    just for that reason. *)
-Definition game_engine (s : State) (e : Event) : State :=
+Definition game_engine (s : State) (e : GameEvent) : State :=
   match s.(current_phase), e with
   | UserSelecting selection, CardClick card =>
     match handle_click selection card with

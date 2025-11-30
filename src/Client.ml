@@ -29,18 +29,6 @@ let get_color_str val_f3 =
 module C2d = Brr_canvas.C2d
 module Path = Brr_canvas.C2d.Path
 
-let card_w = 80.
-let card_h = 120.
-let gap_x = 15.
-let gap_y = 15.
-let start_x = 20.
-let start_y = 20.
-
-let get_geometry col_idx row_idx =
-  let x = start_x +. (float_of_int col_idx) *. (card_w +. gap_x) in
-  let y = start_y +. (float_of_int row_idx) *. (card_h +. gap_y) in
-  (x, y, card_w, card_h)
-
 let status_to_string = function
   | MsgSelect -> "Select 3 cards..."
   | MsgMatch -> "Match Found!"
@@ -153,19 +141,17 @@ let render_scene ctx state =
     | GameOver -> Normal
     in
 
-  List.iteri (fun col_idx column ->
-    let render_slot row_idx slot_opt =
-      match slot_opt with
-      | None -> () (* Maybe a placeholder? *)
-      | Some card ->
-          let (x, y, w, h) = get_geometry col_idx row_idx in
-          draw_card ctx card x y w h (get_style card)
-    in
-    render_slot 0 column.r1;
-    render_slot 1 column.r2;
-    render_slot 2 column.r3;
-  ) state.display_grid;
-  
+  let renderables = Game_engine.layout_grid state.display_grid in
+  List.iter (fun (card, rect) ->
+    let x = float_of_int rect.Game_engine.x in
+    let y = float_of_int rect.Game_engine.y in
+    let w = float_of_int rect.Game_engine.w in
+    let h = float_of_int rect.Game_engine.h in
+
+    let style = get_style card in
+    draw_card ctx card x y w h style
+  ) renderables;
+
   C2d.set_fill_style ctx (C2d.color (Jstr.v "black"));
   C2d.set_font ctx (Jstr.v "24px sans-serif");
   let msg = status_to_string state.status_message in
@@ -186,11 +172,11 @@ and handle_side_effects ctx old_phase new_phase =
   if old_phase <> new_phase then
     match new_phase with
     | AnimatingMatch _ ->
-      ignore (Brr.G.set_timeout ~ms:1000 (fun () -> perform_update ctx AnimationDone))
+      ignore (Brr.G.set_timeout ~ms:1000 (fun () -> perform_update ctx TimerDone))
     | AnimatingFail _ ->
-      ignore (Brr.G.set_timeout ~ms:600 (fun () -> perform_update ctx AnimationDone))
+      ignore (Brr.G.set_timeout ~ms:600 (fun () -> perform_update ctx TimerDone))
     | AnimatingDeal _ ->
-      ignore (Brr.G.set_timeout ~ms:400 (fun () -> perform_update ctx AnimationDone))
+      ignore (Brr.G.set_timeout ~ms:400 (fun () -> perform_update ctx TimerDone))
     | _ -> ()
  
 let on_click ctx x y =
@@ -199,23 +185,12 @@ let on_click ctx x y =
   | Some model ->
     match model.game_state.current_phase with
     | UserSelecting _ ->
-      let col = int_of_float ((x -. start_x) /. (card_w +. gap_x)) in
-      let row = int_of_float ((y -. start_y) /. (card_h +. gap_y)) in
+      let ix = int_of_float x in
+      let iy = int_of_float y in
+      perform_update ctx (Game_engine.ClickAt (ix, iy))
 
-      if col >= 0 && col < List.length model.display_grid then
-        let column = List.nth model.display_grid col in
-        let clicked_slot = match row with
-        | 0 -> column.r1
-        | 1 -> column.r2
-        | 2 -> column.r3
-        | _ -> None
-      in
-
-      begin match clicked_slot with
-      | Some card -> perform_update ctx (CardClick card)
-      | None -> ()
-      end
     | _ -> () (* Ignore clicks during animations *)
+
 
 let () =
   let entry () =
