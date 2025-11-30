@@ -101,6 +101,20 @@ Proof.
   - apply Nat.leb_le; assumption.
 Qed.
 
+(* This is very trivial in the current formulation of deal but it is
+   important if we ever refactor it. In particular, an early implementation
+   always dealt three even if should_stop was true. *)
+Theorem deal_can_do_nothing :
+  forall (deck : list CardTriple) (board : list Point) (dealt : list Point), 
+  should_stop board = true ->
+  deal deck board dealt = (deck, board, dealt).
+Proof.
+  intros deck board dealt Hstop.
+  (* I think for some reason the structure of the Fixpoint makes us need to
+     induct or at least destruct. Irritating! *)
+  destruct deck as [|h deck']; unfold deal; rewrite Hstop; reflexivity.
+Qed.
+
 Theorem deal_satisfies_invariant :
   forall (deck : list CardTriple) (board : list Point) (dealt : list Point),
   after_deal_invariant (fst (deal deck board dealt)).
