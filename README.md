@@ -2,9 +2,12 @@
 
 ## Summary
 
-Formal verification of Finite Affine Geometry $(AG(4,3))$ in Rocq, which is
-used in turn to demo a small browser-based game based on the game Set(R). This
-repository is not affiliated with Set Enterprises, Inc.
+A small browser-based game based on the game Set(R). This
+repository is not affiliated with Set Enterprises, Inc. The main point of interest
+is that we endeavor to verify as much code as possible; for example, it is verified
+that the "deal" function will, if cards are available, place cards on the board
+if and only if there are either fewer than 12 cards or there is not a valid triple
+of cards in play.
 
 ## Structure
 
