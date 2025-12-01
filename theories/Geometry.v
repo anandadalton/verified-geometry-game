@@ -14,7 +14,7 @@ Definition is_inside (px py : Z) (r : Rect) : bool :=
   (r.(y) <=? py) && (py <=? r.(y) + r.(h)).
 
 
-Definition card_w : Z := 80.
+Definition card_w : Z := 100.
 Definition card_h : Z := 120.
 Definition gap_x : Z := 15.
 Definition gap_y : Z := 15.

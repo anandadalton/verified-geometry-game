@@ -89,16 +89,32 @@ let draw_card ctx card x y w h style =
   C2d.set_line_width ctx 3.0;
 
   let count = (f3_to_int dim3) + 1 in
-  let shape_size = w /. 4.0 in
-  let spacing = w /. 3.5 in
-  let total_width = (float_of_int (count - 1)) *. spacing in
-  let center_x_start = (w /. 2.0) -. (total_width /. 2.0) in
+  let center_x = w /. 2.0 in
   let center_y = h /. 2.0 in
+  
+  let shape_size = w /. 3.2 in
 
-  for i = 0 to (count - 1) do
+  let positions = match count with
+  | 1 ->
+    [ (0., 0.) ]
+  | 2 ->
+    let offset = h /. 4.5 in
+    [ (0., -.offset); (0., offset) ]
+  | 3 ->
+    let top_y = -.(h /. 4.5) in
+    let bot_y = (h /. 5.0) in
+    let x_off = (w /. 4.0) in
+    [
+      (0., top_y);
+      (-.x_off, bot_y);
+      (x_off, bot_y)
+    ]
+  | _ -> []
+  in
+
+  List.iter (fun (dx, dy) ->
     C2d.save ctx;
-    let offset_x = center_x_start +. ((float_of_int i) *. spacing) in
-    C2d.translate ctx ~x:offset_x ~y:center_y;
+    C2d.translate ctx ~x:(center_x +. dx) ~y:(center_y +. dy);
 
     let p = Path.create () in
     define_shape p dim1 shape_size;
@@ -118,7 +134,7 @@ let draw_card ctx card x y w h style =
     
     C2d.stroke ctx p;
     C2d.restore ctx;
-  done;
+  ) positions;
   C2d.restore ctx
 
 let render_scene ctx state =
