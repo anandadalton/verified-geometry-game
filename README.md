@@ -1,4 +1,6 @@
-# Summary
+# Finite Affine Geometry
+
+## Summary
 
 Formal verification of Finite Affine Geometry $(AG(4,3))$ in Rocq, which is
 used in turn to demo a small browser-based game based on the game Set(R). This
@@ -57,3 +59,23 @@ said grid in Display.v.
 harness. It uses logic from Geometry.v to convert click events with (x, y)
 representation to something like "option Point" (where this represents a
 card that may have been clicked).
+
+## Building
+
+We assume you have opam installed already; with that assumption, run:
+
+```bash
+opam switch create .
+eval $(opam env)
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam install dune coq coq-stdlib js_of_ocaml-compiler js_of_ocaml-ppx brr
+```
+
+Then, from within the project directory, run
+
+```
+dune build
+```
+
+You should afterwards be able to open the file `src/index.html` and play the
+game in your browser.
