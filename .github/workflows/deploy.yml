@@ -27,6 +27,7 @@ jobs:
 
       - name: Install System Deps
         run: |
+          sudo apt-get update
           opam repo add coq-released https://coq.inria.fr/opam/released
           opam install dune coq coq-stdlib js_of_ocaml-compiler js_of_ocaml-ppx brr
 
