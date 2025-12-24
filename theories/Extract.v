@@ -6,16 +6,14 @@ Require Import Extraction.
 Require Import ClientState.
 Require Import Geometry.
 
-From Stdlib Require Import ZArith.
+From Stdlib Require Import ZArith ExtrOcamlBasic.
 
 Extraction Language OCaml.
 
-Extract Inductive bool => "bool" [ "true" "false" ].
-Extract Inductive sumbool => "bool" [ "true" "false" ].
-Extract Inductive option => "option" [ "Some" "None" ].
-Extract Inductive list => "list" [ "[]" "(::)" ].
-Extract Inductive prod => "(*)" [ "(,)" ].
 
+(* Sorry for the ugly three definitions below.
+   I couldn't find anything in the Stdlib that handles these.
+   I would much rather use someone else's battle-tested code. *)
 Extract Inductive positive => "int"
   [ "(fun x -> 2 * x + 1)" "(fun x -> 2 * x)" "1" ]
   "(fun f2p1 f2p f1 p ->
