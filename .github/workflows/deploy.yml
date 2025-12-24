@@ -47,12 +47,8 @@ jobs:
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-      
-      - name: Deploy to GH Pages
-        uses: actions/deploy-pages@v4
         with:
-          folder: _site
-          branch: gh-pages
+          path: ./_site
 
   deploy:
     environment:
