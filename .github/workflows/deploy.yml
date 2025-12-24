@@ -1,0 +1,65 @@
+name: Deploy Rocq/OCaml Demo
+
+on:
+  push:
+    branches:
+      - main
+    workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup OCaml & Opam
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.2.1
+
+      - name: Install System Deps
+        run: |
+          opam repo add coq-released https://coq.inria.fr/opam/released
+          opam install dune coq coq-stdlib js_of_ocaml-compiler js_of_ocaml-ppx brr
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          dune build
+
+      - name: Prepare Site Artifact
+        run: |
+          mkdir _site
+          cp src/index.html _site/
+          cp _build/default/src/Client.bc.js _site/main.js
+          # Horrible sed hackery to reroot the source code.
+          sed -i 's|src="../_build/default/src/Client.bc.js"|src="./main.js"|' _site/index.html
+          touch _site/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+      
+      - name: Deploy to GH Pages
+        uses: actions/deploy-pages@v4
+        with:
+          folder: _site
+          branch: gh-pages
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
